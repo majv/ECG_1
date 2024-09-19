@@ -23,12 +23,14 @@ plot(tiempo_medio, b_medio);
 title('EMG del Bíceps con Medio Kilo de Carga');  
 xlabel('Tiempo [s]');  
 ylabel('Amplitud [V]'); 
+ylim([-3 2]);
 
 subplot(2,1,2);  
 plot(tiempo_medio, t_medio);
 title('EMG del Tríceps con Medio Kilo de Carga'); 
 xlabel('Tiempo [s]');  
 ylabel('Amplitud [V]');  
+ylim([-3 2]);
 
 figure;
 subplot(2,1,1); 
@@ -36,12 +38,14 @@ plot(tiempo_tres, b_tres);
 title('EMG del Bíceps con Tres Kilos de Carga');  
 xlabel('Tiempo [s]');  
 ylabel('Amplitud [V]'); 
+ylim([-3 2]);
 
 subplot(2,1,2);  
 plot(tiempo_tres, t_tres);
 title('EMG del Tríceps con Tres Kilos de Carga'); 
 xlabel('Tiempo [s]');  
-ylabel('Amplitud [V]');  
+ylabel('Amplitud [V]'); 
+ylim([-3 2]);
 
 figure;
 for i = 1:5
@@ -51,6 +55,7 @@ for i = 1:5
     title(['Segmento ' num2str(i) ' Bíceps']);
     xlabel('Tiempo [s]');
     ylabel('Amplitud [V]');
+    ylim([-3 2]);
     
     subplot(2, 5, i+5);  
     plot(tiempo_medio(segmentos_medio(i,1):segmentos_medio(i,2)), ...
@@ -58,6 +63,7 @@ for i = 1:5
     title(['Segmento ' num2str(i) ' Tríceps']);
     xlabel('Tiempo [s]');
     ylabel('Amplitud [V]');
+    ylim([-3 2]);
 end
 
 figure;
@@ -68,6 +74,7 @@ for i = 1:5
     title(['Segmento ' num2str(i) ' Bíceps']);
     xlabel('Tiempo [s]');
     ylabel('Amplitud [V]');
+    ylim([-3 2]);
     
     subplot(2, 5, i+5);  
     plot(tiempo_tres(segmentos_tres(i,1):segmentos_tres(i,2)), ...
@@ -75,13 +82,14 @@ for i = 1:5
     title(['Segmento ' num2str(i) ' Tríceps']);
     xlabel('Tiempo [s]');
     ylabel('Amplitud [V]');
+    ylim([-3 2]);
 end
 
 % Función para calcular RMS
 calcRMS = @(x) sqrt(mean(x.^2));
 
-% Inicializar matrices de resultados
-rms_medio_biceps = zeros(1, 5);
+
+rmsmediob = zeros(1, 5);
 rms_medio_triceps = zeros(1, 5);
 rms_tres_biceps = zeros(1, 5);
 rms_tres_triceps = zeros(1, 5);
@@ -96,25 +104,25 @@ cruces_medio_triceps = zeros(1, 5);
 cruces_tres_biceps = zeros(1, 5);
 cruces_tres_triceps = zeros(1, 5);
 
-% Calcular métricas para medio kilo
+%  métricas para medio kilo
 for i = 1:5
-    segmento_biceps_medio = b_medio(segmentos_medio(i,1):segmentos_medio(i,2));
-    rms_medio_biceps(i) = calcRMS(segmento_biceps_medio);
+    segbmedio = b_medio(segmentos_medio(i,1):segmentos_medio(i,2));
+    rmsmediob(i) = calcRMS(segbmedio);
     
     segmento_triceps_medio = t_medio(segmentos_medio(i,1):segmentos_medio(i,2));
     rms_medio_triceps(i) = calcRMS(segmento_triceps_medio);
     
-    env_biceps_medio = envelope(abs(segmento_biceps_medio), 100, 'peak');
+    env_biceps_medio = envelope(abs(segbmedio), 100, 'peak');
     area_medio_biceps(i) = trapz(tiempo_medio(segmentos_medio(i,1):segmentos_medio(i,2)), env_biceps_medio);
     
     env_triceps_medio = envelope(abs(segmento_triceps_medio), 100, 'peak');
     area_medio_triceps(i) = trapz(tiempo_medio(segmentos_medio(i,1):segmentos_medio(i,2)), env_triceps_medio);
     
-    cruces_medio_biceps(i) = sum(diff(segmento_biceps_medio > 0) ~= 0);
+    cruces_medio_biceps(i) = sum(diff(segbmedio > 0) ~= 0);
     cruces_medio_triceps(i) = sum(diff(segmento_triceps_medio > 0) ~= 0);
 end
 
-% Calcular métricas para tres kilos
+%  métricas para tres kilos
 for i = 1:5
     segmento_biceps_tres = b_tres(segmentos_tres(i,1):segmentos_tres(i,2));
     rms_tres_biceps(i) = calcRMS(segmento_biceps_tres);
@@ -132,10 +140,9 @@ for i = 1:5
     cruces_tres_triceps(i) = sum(diff(segmento_triceps_tres > 0) ~= 0);
 end
 
-% Mostrar resultados en la consola
 disp('Resultados para medio kilo:');
 disp('RMS del Bíceps:');
-disp(rms_medio_biceps);
+disp(rmsmediob);
 disp('RMS del Tríceps:');
 disp(rms_medio_triceps);
 disp('Área bajo la curva del Bíceps:');
@@ -161,9 +168,9 @@ disp(cruces_tres_biceps);
 disp('Número de Cruces por Cero del Tríceps:');
 disp(cruces_tres_triceps);
 
-% Calculamos el valor promedio y la mediana para cada medida
-promedio_rms_biceps_medio = mean(rms_medio_biceps);
-mediana_rms_biceps_medio = median(rms_medio_biceps);
+%promedio
+promedio_rms_biceps_medio = mean(rmsmediob);
+mediana_rms_biceps_medio = median(rmsmediob);
 
 promedio_rms_biceps_tres = mean(rms_tres_biceps);
 mediana_rms_biceps_tres = median(rms_tres_biceps);
@@ -198,7 +205,7 @@ mediana_cruces_triceps_medio = median(cruces_medio_triceps);
 promedio_cruces_triceps_tres = mean(cruces_tres_triceps);
 mediana_cruces_triceps_tres = median(cruces_tres_triceps);
 
-% Mostrar resultados estadísticos en la consola
+% resultados
 disp('Resultados Estadísticos:');
 disp('RMS del Bíceps con 1/2 KG:');
 disp(['Promedio: ', num2str(promedio_rms_biceps_medio)]);
@@ -249,7 +256,7 @@ disp(['Promedio: ', num2str(promedio_cruces_triceps_tres)]);
 disp(['Mediana: ', num2str(mediana_cruces_triceps_tres)]);
 
 % Crear tabla para los resultados
-resultados = table((1:5)', rms_medio_biceps', rms_tres_biceps', rms_medio_triceps', rms_tres_triceps', ...
+resultados = table((1:5)', rmsmediob', rms_tres_biceps', rms_medio_triceps', rms_tres_triceps', ...
     area_medio_biceps', area_tres_biceps', area_medio_triceps', area_tres_triceps', ...
     cruces_medio_biceps', cruces_tres_biceps', cruces_medio_triceps', cruces_tres_triceps', ...
     'VariableNames', {'Repeticion', 'RMS_Biceps_1_2KG', 'RMS_Biceps_3KG', 'RMS_Triceps_1_2KG', 'RMS_Triceps_3KG', ...
@@ -258,7 +265,7 @@ resultados = table((1:5)', rms_medio_biceps', rms_tres_biceps', rms_medio_tricep
 
 disp(resultados);
 
-% Crear tabla para valores promedio y medianos
+% tabla
 resultados_estadisticos = table({'Promedio'; 'Mediana'}, ...
     [promedio_rms_biceps_medio; mediana_rms_biceps_medio], ...
     [promedio_rms_biceps_tres; mediana_rms_biceps_tres], ...
@@ -283,77 +290,80 @@ disp(resultados_estadisticos);
 %% Punto 5
 
 segmento = 3;
-% Extraer los segmentos de interés
 senal_medio = b_medio(segmentos_medio(segmento,1):segmentos_medio(segmento,2));
 senal_tres = b_tres(segmentos_tres(segmento,1):segmentos_tres(segmento,2));
 
-% Calcular el espectro 
+% espectro
 nfft = 2^nextpow2(length(senal_medio)); 
 [Pxx_medio, F_medio] = pwelch(senal_medio, [], [], nfft, fs);
 [Pxx_tres, F_tres] = pwelch(senal_tres, [], [], nfft, fs);
 
-% Limitar el rango de frecuencia a 0-600 Hz
+% Limitar 
 idx_600_medio = find(F_medio <= 600, 1, 'last');
 idx_600_tres = find(F_tres <= 600, 1, 'last');
 
+% Eliminar frecuencias bajas 
+min_freq_idx_medio = find(F_medio >= 20, 1, 'first');
+min_freq_idx_tres = find(F_tres >= 20, 1, 'first');
+
+F_medio = F_medio(min_freq_idx_medio:idx_600_medio); 
+Pxx_medio = Pxx_medio(min_freq_idx_medio:idx_600_medio); 
+F_tres = F_tres(min_freq_idx_tres:idx_600_tres); 
+Pxx_tres = Pxx_tres(min_freq_idx_tres:idx_600_tres); 
+
+% Suavizar el espectro
+Pxx_medio_suave = smoothdata(Pxx_medio, 'movmean', 10);
+Pxx_tres_suave = smoothdata(Pxx_tres, 'movmean', 10);
+
 % Calcular frecuencia media y mediana
-freq_media_medio = sum(F_medio(1:idx_600_medio) .* Pxx_medio(1:idx_600_medio)) / sum(Pxx_medio(1:idx_600_medio));
-freq_mediana_medio = F_medio(find(cumsum(Pxx_medio(1:idx_600_medio)) >= sum(Pxx_medio(1:idx_600_medio))/2, 1));
-freq_media_tres = sum(F_tres(1:idx_600_tres) .* Pxx_tres(1:idx_600_tres)) / sum(Pxx_tres(1:idx_600_tres));
-freq_mediana_tres = F_tres(find(cumsum(Pxx_tres(1:idx_600_tres)) >= sum(Pxx_tres(1:idx_600_tres))/2, 1));
+freq_media_medio = sum(F_medio .* Pxx_medio_suave) / sum(Pxx_medio_suave);
+freq_mediana_medio = F_medio(find(cumsum(Pxx_medio_suave) >= sum(Pxx_medio_suave)/2, 1));
+freq_media_tres = sum(F_tres .* Pxx_tres_suave) / sum(Pxx_tres_suave);
+freq_mediana_tres = F_tres(find(cumsum(Pxx_tres_suave) >= sum(Pxx_tres_suave)/2, 1));
 
 % Calcular potencia total
-potencia_total_medio = sum(Pxx_medio(1:idx_600_medio));
-potencia_total_tres = sum(Pxx_tres(1:idx_600_tres));
+potencia_total_medio = sum(Pxx_medio_suave);
+potencia_total_tres = sum(Pxx_tres_suave);
+
+
+max_pxx = max([max(Pxx_medio_suave), max(Pxx_tres_suave)]);
 
 % Graficar
 figure('Position', [100, 100, 1200, 500]);
 
 subplot(1, 2, 1);
-graficarEspectro(F_medio(1:idx_600_medio), Pxx_medio(1:idx_600_medio), freq_media_medio, freq_mediana_medio, potencia_total_medio, 'Espectro de Frecuencia Bíceps con Medio Kilo: Segmento 3');
+graficarEspectro(F_medio, Pxx_medio_suave, freq_media_medio, freq_mediana_medio, potencia_total_medio, max_pxx, 'Espectro de Frecuencia Bíceps con Medio Kilo: Segmento 3');
 
 subplot(1, 2, 2);
-graficarEspectro(F_tres(1:idx_600_tres), Pxx_tres(1:idx_600_tres), freq_media_tres, freq_mediana_tres, potencia_total_tres, 'Espectro de Frecuencia Bíceps con Tres Kilos: Segmento 3');
+graficarEspectro(F_tres, Pxx_tres_suave, freq_media_tres, freq_mediana_tres, potencia_total_tres, max_pxx, 'Espectro de Frecuencia Bíceps con Tres Kilos: Segmento 3');
 
 sgtitle('Espectro de Frecuencia para EMG del Bíceps: Segmento 3', 'FontSize', 16);
 
-% Mostrar resultados
+% Mostrar resultados en el Command Window con unidades de potencia
 fprintf('Resultados para Bíceps con Medio Kilo del Segmento 3:\n');
 fprintf('Frecuencia Media: %.2f Hz\n', freq_media_medio);
 fprintf('Frecuencia Mediana: %.2f Hz\n', freq_mediana_medio);
-fprintf('Potencia Total: %.2e\n\n', potencia_total_medio);
+fprintf('Potencia Total: %.2e V²/Hz\n\n', potencia_total_medio);  % Unidades en el Command Window
 
 fprintf('Resultados para Bíceps con Tres Kilos del Segmento 3:\n');
 fprintf('Frecuencia Media: %.2f Hz\n', freq_media_tres);
 fprintf('Frecuencia Mediana: %.2f Hz\n', freq_mediana_tres);
-fprintf('Potencia Total: %.2e\n\n', potencia_total_tres);
+fprintf('Potencia Total: %.2e V²/Hz\n\n', potencia_total_tres);  % Unidades en el Command Window
 
-% Función para graficar y marcar las áreas de F. media y mediana
-function graficarEspectro(F, Pxx, freq_media, freq_mediana, potencia_total, titulo)
-    plot(F, Pxx, 'b', 'LineWidth', 1.5);
-    hold on;
-
-    idx_media = find(F <= freq_media, 1, 'last');
-    idx_mediana = find(F <= freq_mediana, 1, 'last');
-
-    fill([F(1:idx_mediana); flipud(F(1:idx_mediana))], [Pxx(1:idx_mediana); zeros(size(Pxx(1:idx_mediana)))], 'c', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
-    
-    fill([F(idx_mediana:idx_media); flipud(F(idx_mediana:idx_media))], [Pxx(idx_mediana:idx_media); zeros(size(Pxx(idx_mediana:idx_media)))], 'm', 'FaceAlpha', 0.3, 'EdgeColor', 'none');
-    
-    xline(freq_media, 'm--', 'LineWidth', 1.5);
-    xline(freq_mediana, 'c--', 'LineWidth', 1.5);
-    
-    title(titulo, 'FontSize', 14);
-    xlabel('Frecuencia [Hz]', 'FontSize', 12);
-    ylabel('Potencia [V²]', 'FontSize', 12);
-    xlim([0 600]); 
-    ylim([0 max(Pxx)*1.1]);
-
-    text(550, max(Pxx)*0.5, sprintf('Potencia Total: %.2e', potencia_total), 'FontSize', 10, 'FontWeight', 'bold', 'HorizontalAlignment', 'right');
-    
-    legend('Espectro','Frecuencia Media', 'Frecuencia Mediana', 'Location', 'northeast');
-    grid on;
+% Función para graficar
+function graficarEspectro(F, Pxx, freq_media, freq_mediana, potencia_total, max_pxx, titulo)
+ plot(F, Pxx, 'b', 'LineWidth', 1.5);
+ hold on;
+ xline(freq_media, 'm--', 'LineWidth', 1.5);
+ xline(freq_mediana, 'c--', 'LineWidth', 1.5);
+ title(titulo, 'FontSize', 14);
+ xlabel('Frecuencia [Hz]', 'FontSize', 12);
+ ylabel('Potencia [V²]', 'FontSize', 12); % Etiqueta genérica ya que las unidades están en el Command Window
+ xlim([0 600]); 
+ ylim([0 max_pxx*1.1]); % Ajuste a la misma escala en ambos gráficos
+ 
+ text(550, max_pxx*0.5, sprintf('Potencia Total: %.2e [V²/Hz]', potencia_total), 'FontSize', 10, 'FontWeight', 'bold', 'HorizontalAlignment', 'right');
+ 
+ legend('Espectro', 'Frecuencia Media', 'Frecuencia Mediana', 'Location', 'northeast');
+ grid on;
 end
-
-
-
